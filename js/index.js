@@ -1,7 +1,7 @@
 $(function(){
 	// 为栏目绑定事件
 	$("ul.left_nav").on("click","li",function(){
-		// this = event.currentTarget]
+		// this = event.currentTarget
 		$("ul.left_nav > li").removeClass("current");
 		$(this).addClass("current");
 		var url = $(this).attr("url");
