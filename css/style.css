@@ -30,6 +30,14 @@ html,body,.container {
 	text-align: center;
 	line-height: 3em;
 	background-color: #1D1E26;
+	cursor: pointer;
+}
+.left >ul.left_nav > li > i{
+	margin-right: 15px;
+	color: #BCBCBE;
+}
+.left >ul.left_nav > li > i.current_i{
+	color: white;
 }
 .left >ul.left_nav > li.current{
 	background-color: #009688;
@@ -38,6 +46,9 @@ html,body,.container {
 	color: white;
 }
 .left >ul.left_nav > li.current a{
+	color: #fff;
+}
+.left >ul.left_nav > li.current i{
 	color: #fff;
 }
 
