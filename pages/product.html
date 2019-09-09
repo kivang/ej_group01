@@ -1,10 +1,266 @@
 <style>
-	
-</style>
-<script>
-	
-</script>
+.table {
+	border-collapse: collapse;
+	width: 100%;
+	text-align: center;
+}
+.table td {
+	border: 1px solid #ccc;
+	line-height: 2em;
+}
+.table tr.current {
+	background-color: #ededed;
+}
+.daohang{
+	background-color:#a3dadd;
+}
+.none {
+	display: none;
+}
+.btn {
+	padding: .5em 1em;
+	border-radius: 3px;
+	background-color: teal;
+	border: 1px solid #c2c2c2;
+	color: #ffffff;
+	cursor: pointer;
+	display: inline-block;
+}
+.sousuo{
+	margin-top: 10px;
+}
+.sousuo :first-child{
+	width: 200px;
+}
 
-<div class="customer">
-	<div>产品管理</div>
-</div>
+a{
+	color: #333;
+	text-decoration-line: none;
+}
+.btns {
+	margin-bottom: .5em;
+}
+tbody >tr:nth-child(odd){
+	background:#ecf8f8;
+}
+tbody >tr:nth-child(even){
+	background:#ffffff;
+}	
+</style>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+	<!-- <script type="text/javascript" src="../js/product.js"></script> -->
+<body>
+	<div class="btns">
+		<div id="btn_add" class="btn">添加</div>
+		<div id="btn_batch_del" class="btn">批量删除</div>
+		<div id="btn_add" class="btn">导出</div>
+<!-- 		<div class="sousuo">
+			<div>
+				<input type="text" placeholder="请输入您想要查询的内容"></div>
+				
+		</div> -->
+	</div>
+
+	<div style="margin-bottom: .5em">
+		<!-- 表单 -->
+		<form action="javascript:void(0)">
+			<input type="hidden" name="id" />
+			产品名<input type="text" name="name"/>
+			描述 <input type="text" name="description"/>
+			<input type="submit" value="提交">
+		</form>
+	</div>
+
+
+	<table class="table" id="products_tbl">
+		<thead>
+			<tr class="daohang">
+				<td>编号</td>
+				<td>产品名</td>
+				<td>描述</td>
+				<td>价格</td>
+				<td>状态</td>
+				<td>图片</td>
+				<td>类别</td>
+				<td>操作</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="none">
+				<td><input type="checkbox"></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td>
+					<a class="btn_del" href="#">删除</a>
+					<a class="btn_upd" href="#">修改</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+<script>
+var baseURL = "http://134.175.154.93:6677";
+
+		var btn_add = document.getElementById("btn_add");
+		var tbody = document.getElementsByTagName("tbody")[0];
+		// 为表单绑定事件
+		document.forms[0].onsubmit = function(event){
+			// 1. 获取用户的输入
+			var id = document.querySelector("input[name=id]").value;
+			var name = document.querySelector("input[name=name]").value;
+			var description = document.querySelector("input[name=description]").value;
+			var url = baseURL+"/product/insertProduct";
+			var data;
+			 if(id){
+			 	var url = baseURL+"/product/updateProduct";
+				var data ={
+				id:id,
+				name:name,
+				description:description
+			};
+			$.post(url,data,function(a,b){
+				alert("修改成功")
+				reloadData();
+			});
+			} else {
+				var url = baseURL+"/product/insertProduct";
+				var data ={
+				id:id,
+				name:name,
+				description:description
+			};
+			console.log(data)
+			$.post(url,data,function(a,b){
+				alert("添加成功")
+				reloadData();
+			});
+			}
+		
+			// 3. 页面的局部更新
+			event.preventDefault();
+		}
+		// 给添加按钮绑定事件
+		btn_add.onclick = function(){
+			document.querySelector("input[name=name]").value = "";
+			document.querySelector("input[name=description]").value = "";
+			document.querySelector("input[name=id]").value = "";
+			
+		}
+		// 当光标移动的某一行上，为这一行添加背景
+		tbody.onmouseover = function(event){
+			var target = event.target;
+			if(target.nodeName === "TD"){
+				target.parentNode.className = "current"
+			}
+		}
+		tbody.onmouseout = function(event){
+			var target = event.target;
+			if(target.nodeName === "TD"){
+				target.parentNode.className = ""
+			}
+		}
+
+		// 给删除按钮绑定事件
+		tbody.onclick = function(event){
+			if(event.target.nodeName === "A"){
+				switch(event.target.className){
+					case "btn_del":
+						// 1. 先获取要删除的id
+						var id = event.target.parentNode.parentNode.firstElementChild.firstElementChild.value;
+						// 2. 编写ajax进行删除
+						var url = baseURL+"/product/deleteProductById";
+						var data = "id="+id;
+						$.post(url,data,function(response,status){
+							alert(response.message);
+							reloadData();
+						});
+
+						break;
+					case "btn_upd":
+						var id = event.target.parentNode.parentNode.children[0].firstElementChild.value;
+						var name = event.target.parentNode.parentNode.children[1].innerText;
+						var description = event.target.parentNode.parentNode.children[3].innerText;
+						document.querySelector("input[name=name]").value = name;
+						document.querySelector("input[name=description]").value = description;
+						document.querySelector("input[name=id]").value = id;break;
+				}
+			}
+		}
+		$("#btn_batch_del").click(function(){
+		var idList = 
+		$("#products_tbl input:checkbox").filter(":checked")
+		.map(function(index,item){
+			return $(item).val()
+		})
+		.toArray();
+		// 调用后台接口删除顾客信息
+		/*
+		[1,2]
+		"ids=1&ids=2"
+		*/
+		var data ="";
+		for(var key in idList){
+			var id = idList[key];
+			if(key==0){
+				data+="idList="+id
+			} else {
+				data+="&idList="+id
+			}
+		}
+
+		$.ajax({
+			url:baseURL+"/product/deleteBathProduct",
+			method:"post",
+			data:data,
+			success:function(result){
+				console.log(result);
+				if(result.status === 200){
+					alert("批量删除成功");
+					// 更新页面
+					reloadData();
+				} else {
+					alert("请选择你要删除的项目啊");
+				}
+			}
+		})
+	})
+		// 重载数据
+		function reloadData(){
+			//1. 通过ajax获取后台数据
+			var url = baseURL+"/product/findAllProduct";
+			$.get(url,function(response,status){
+				// 先将tbody原有的数据删除掉
+				Array.prototype.slice.call(tbody.children,0).forEach(function(item,index){
+					if(index !== 0 ){
+						tbody.removeChild(item)
+					}
+				})
+				//2. 将查询到的数据渲染到页面中
+				response.data.forEach(function(item){
+					// 2.1 创建一个tr,然后将数据添加到tr中
+					var newTr = tbody.firstElementChild.cloneNode(true);
+					newTr.children[0].firstElementChild.value = item.id;
+					newTr.children[1].innerText = item.name;
+					newTr.children[2].innerText = item.description;
+					newTr.children[3].innerText = item.price;
+					newTr.children[4].innerText = item.status;
+					newTr.children[5].innerText = item.photo;
+					newTr.children[6].innerText = item.categoryId;
+					newTr.setAttribute("class","");
+					// 2.2 将tr追加到tbody中
+					tbody.appendChild(newTr);
+					document.querySelector("input[name=id]").value = "";
+					document.querySelector("input[name=name]").value = "";
+					document.querySelector("input[name=description]").value = "";
+				})
+			})
+			// 调用重载数据方法
+		
+	}
+	reloadData();
+	</script>
+</body>

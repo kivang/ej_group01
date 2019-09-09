@@ -122,27 +122,30 @@
 			var realname = document.querySelector("input[name=realname]").value;
 			var telephone = document.querySelector("input[name=telephone]").value;
 
-			var url = baseURL+"/waiter/insertWaiter";
-			var data ={
-				id:id,
-				realname:realname,
-				telephone:telephone
-			};
-			$.post(url,data,function(a,b){
-				reloadData();
-			});
-			
-			var url = baseURL+"/waiter/updateWaiter";
-			var data ={
-				id:id,
-				realname:realname,
-				telephone:telephone
-			};
-			$.post(url,data,function(a,b){
-				alert("保存成功")
-				reloadData();
-			});
 
+			if (id) {
+				var url = baseURL+"/waiter/updateWaiter";
+				var data ={
+				id:id,
+				realname:realname,
+				telephone:telephone
+			};
+			$.post(url,data,function(a,b){
+				alert("修改成功")
+				reloadData();
+			});
+			} else{
+			var url = baseURL+"/waiter/insertWaiter";
+				var data ={
+				id:id,
+				realname:realname,
+				telephone:telephone
+			};
+			$.post(url,data,function(a,b){
+				alert("添加成功")
+				reloadData();
+			});
+			}
 			event.preventDefault();
 		}
 
@@ -219,6 +222,7 @@
 					newTr.setAttribute("class","");
 					// 2.2 将tr追加到tbody中
 					tbody.appendChild(newTr);
+					document.querySelector("input[name=id]").value = "";
 					document.querySelector("input[name=realname]").value = "";
 					document.querySelector("input[name=telephone]").value = "";
 				})
