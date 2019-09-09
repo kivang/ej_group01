@@ -1,11 +1,39 @@
 $(function(){
 	// 为栏目绑定事件
 	$("ul.left_nav").on("click","li",function(){
-		// this = event.currentTarget]
+		// this = event.currentTarget — > li
 		$("ul.left_nav > li").removeClass("current");
 		$(this).addClass("current");
+		var list = this.parentNode.children
+		var lis = Array.prototype.slice.call(list,0)
+		for (var i = 0; i < lis.length; i++) {
+			if (lis[i]==this) {
+				switch (i){
+				case 0:
+					$(".container > .right >.content >.mb_nav > span").removeClass("current_P")
+					$("#0").addClass("current_P");
+					break;
+				case 1:
+					$(".container > .right >.content >.mb_nav > span").removeClass("current_P")
+					$("#1").addClass("current_P");break;
+				case 2:
+					$(".container > .right >.content >.mb_nav > span").removeClass("current_P")
+					$("#2").addClass("current_P");break;
+				case 3:
+					$(".container > .right >.content >.mb_nav > span").removeClass("current_P")
+					$("#3").addClass("current_P");break;
+				case 4:
+					$(".container > .right >.content >.mb_nav > span").removeClass("current_P")
+					$("#4").addClass("current_P");break;
+				case 5:
+					$(".container > .right >.content >.mb_nav > span").removeClass("current_P")
+					$("#5").addClass("current_P");break;
+			}				
+			}
+			
+		}
 		var url = $(this).attr("url");
-		$("#wrapper").load(url)
+		$("#wrapper").load(url+"?time="+Math.random())
 	})
 
 		$("ul.left_nav > li").mouseenter(function(){
