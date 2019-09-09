@@ -91,7 +91,7 @@ $(function(){
 				//1. 将当前行信息设置到表单中
 				var id = $(this).parents("tr").children().eq(0).find("input").val();
 				var realname = $(this).parents("tr").children().eq(1).text();
-				var telephone = $(this).parents("tr").children().eq(2).text();
+				var telephone = $(this).parents("tr").children().eq(3).text();
 
 				$("#customer_form input[name=id]").val(id);
 				$("#customer_form input[name=realname]").val(realname);
