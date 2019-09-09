@@ -1,7 +1,11 @@
 $(function(){
 	// 为栏目绑定事件
 	$("ul.left_nav").on("click","li",function(){
+<<<<<<< HEAD
 		// this = event.currentTarget — > li
+=======
+		// this = event.currentTarget
+>>>>>>> 55ac3207143a95f702564d0ad7eb40a992d01f8e
 		$("ul.left_nav > li").removeClass("current");
 		$(this).addClass("current");
 		var list = this.parentNode.children
