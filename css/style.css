@@ -71,7 +71,12 @@ html,body,.container {
 	line-height: 2em;
 	margin-bottom: .5em;
 }
-
+.container > .right >.content >.mb_nav > span{
+	display: none;
+}
+.container > .right >.content >.mb_nav > .current_P{
+	display: inline;
+}
 
 
 
