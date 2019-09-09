@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>顾客界面</title>
+	<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+	<style>
+		.table {
+			border-collapse: collapse;
+			width: 100%;
+			text-align: center;
+		}
+		.table td {
+			border: 1px solid #ccc;
+			line-height: 2em;
+		}
+		.table tr.current {
+			background-color: #E7F7FE;
+		}
+		.none {
+			display: none;
+		}
+		.btn {
+			padding: .5em 1em;
+			border-radius: 3px;
+			color: black;
+			cursor: pointer;
+			display: inline-block;
+			border:1px solid #ccc;
+		}
+		.btns {
+			margin-bottom: .5em;
+		}
+		a{
+			text-decoration: none;
+		}
+	</style>
+</head>
+<body>
+	<h2>服务员管理</h2>
+	<!-- 注释节点 -->
+	<div class="btns">
+		<div id="btn_add" class="btn">添&nbsp加</div>
+		<div id="btn_import" class="btn">批量导入</div>
+	</div>
+	
+	<div style="margin-bottom: .5em">
+		<!-- 表单 -->
+		<form action="javascript:void(0)">
+			<input type="hidden" name="id" />
+			姓名<input type="text" name="realname"/>
+			手机号 <input type="text" name="telephone"/>
+			<input type="submit" value="提交">
+		</form>
+	</div>
+
+
+	<table class="table">
+		<thead>
+			<tr class="first">
+				<td width="80px">编号</td>
+				<td>姓名</td>
+				<td>状态</td>
+				<td>手机号</td>
+				<td width="100px">操作</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="none">
+				<td><input type="checkbox"></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td>
+					<a class="btn_del" href="#">删除</a>
+					<a class="btn_upd" href="#">修改</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+
+	<script>
+		$(function(){
+	reloadData();
+	$("tbody").on({
+	mouseover:function(){
+		this.className = "current"
+	},
+	mouseout:function(){
+		this.className = ""
+	}
+			},'tr')
+	$(".btn").mouseout(function(){
+    //移出时触发
+    $(this).css({"border":"1px solid #ccc","color":"black"});
+}).mouseover(function(){
+    //移入时触发
+    $(this).css({"border":"1px solid #2E9AFE","color":"#2E9AFE"});
+});
+})
+		$.ajaxSetup({
+			timeout:1000,
+			error:function(error){
+				alert("出现错误了！");
+				console.log(error);
+			},
+			complete:function(){
+				console.log("---------");
+			}
+		})
+
+		var baseURL = "http://134.175.154.93:6677"
+
+		var btn_add = document.getElementById("btn_add");
+		var tbody = document.getElementsByTagName("tbody")[0];
+
+		// 为表单绑定事件
+		document.forms[0].onsubmit = function(event){
+			// 1. 获取用户的输入
+
+			var id = document.querySelector("input[name=id]").value;
+			var realname = document.querySelector("input[name=realname]").value;
+			var telephone = document.querySelector("input[name=telephone]").value;
+
+			var url = baseURL+"/customer/saveCustomerOrUpdateCustomer";
+			var data ={
+				id:id,
+				realname:realname,
+				telephone:telephone
+			};
+
+			$.post(url,data,function(a,b){
+				alert(a.message);
+				reloadData();
+			});
+
+			event.preventDefault();
+		}
+
+
+		// 给添加按钮绑定事件
+		btn_add.onclick = function(){
+			document.querySelector("input[name=realname]").value = "";
+			document.querySelector("input[name=telephone]").value = "";
+			document.querySelector("input[name=id]").value = "";
+			
+		}
+
+		// 当光标移动的某一行上，为这一行添加背景
+		tbody.onmouseover = function(event){
+			var target = event.target;
+			if(target.nodeName === "TD"){
+				target.parentNode.className = "current"
+			}
+		}
+		tbody.onmouseout = function(event){
+			var target = event.target;
+			if(target.nodeName === "TD"){
+				target.parentNode.className = ""
+			}
+		}
+
+		// 给删除按钮绑定事件
+		tbody.onclick = function(event){
+			if(event.target.nodeName === "A"){
+				switch(event.target.className){
+					case "btn_del":
+						// 1. 先获取要删除的id
+						var id = event.target.parentNode.parentNode.firstElementChild.firstElementChild.value;
+						var url = baseURL+"/customer/deleteCustomerById";
+						var data = "id="+id;
+						$.post(url,data,function(response,status){
+							alert(response.message);
+							reloadData();
+						});
+						break;
+					case "btn_upd":
+						var id = event.target.parentNode.parentNode.children[0].firstElementChild.value;
+						var realname = event.target.parentNode.parentNode.children[1].innerText;
+						var telephone = event.target.parentNode.parentNode.children[3].innerText;
+						document.querySelector("input[name=realname]").value = realname;
+						document.querySelector("input[name=telephone]").value = telephone;
+						document.querySelector("input[name=id]").value = id;
+						break;
+				}
+			}
+		}
+
+		// 重载数据
+		function reloadData(){
+			//1. 通过ajax获取后台数据
+			var url = baseURL+"/customer/findCustomerAll";
+			$.get(url,function(response,status){
+				// 先将tbody原有的数据删除掉
+				Array.prototype.slice.call(tbody.children,0).forEach(function(item,index){
+					if(index !== 0 ){
+						tbody.removeChild(item)
+					}
+				})
+				//2. 将查询到的数据渲染到页面中
+				response.data.forEach(function(item){
+					// 2.1 创建一个tr,然后将数据添加到tr中
+					var newTr = tbody.firstElementChild.cloneNode(true);
+					newTr.children[0].firstElementChild.value = item.id;
+					newTr.children[1].innerText = item.realname;
+					newTr.children[2].innerText = item.status;
+					newTr.children[3].innerText = item.telephone;
+					newTr.setAttribute("class","");
+					// 2.2 将tr追加到tbody中
+					tbody.appendChild(newTr);
+				})
+			})
+		}
+		reloadData();
+
+
+	</script>
+
+
+</body>
+</html>
+
+
+
+
